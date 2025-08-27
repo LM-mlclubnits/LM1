@@ -4,8 +4,10 @@ import torch
 from model.tokenizer import Tokenizer
 from model.Decoder import Decoder
 from model.TrainModel import train_model
+from data.stories_list import stories
 
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 st.title("Sentence Completer")
 
 texts = [
@@ -115,86 +117,11 @@ texts = [
     "Hi, are you hungry? A little. Want to eat together? Sure."
 ]
 
-stories = [
-    # A fantasy adventure
-    """Once upon a time, in a kingdom surrounded by tall mountains and endless rivers, 
-    there lived a young girl named Elara who dreamed of exploring the world beyond her village. 
-    Every morning she would stand by the old stone bridge, watching travelers come and go, 
-    carrying stories of distant lands filled with mysteries and treasures. 
-    One day, Elara discovered a golden feather lying on her windowsill. 
-    She picked it up, and suddenly, a voice whispered in her mind: 
-    'Follow the feather, and you will find the truth of your destiny.' 
-    With courage in her heart, she packed a small bag, said goodbye to her family, 
-    and set out on a journey that would take her across forests, deserts, and seas. 
-    Along the way, she befriended a talking wolf, saved a village from a terrible flood, 
-    and found a map that glowed whenever she was close to her destiny. 
-    At last, after many trials, she reached the edge of the world where the sky touched the ocean, 
-    and there she discovered that the feather belonged to a phoenix, 
-    a creature of fire and rebirth that guarded the secrets of creation itself. 
-    With the phoenix as her guide, Elara learned that her true power was not just in seeking adventure, 
-    but in giving hope to those she met on her journey.""",
-
-    # A sci-fi exploration
-    """In the year 2450, humanity had finally mastered interstellar travel. 
-    Captain Arin commanded the starship Horizon, the first vessel to journey beyond the Milky Way. 
-    The crew of explorers, scientists, and engineers had trained their whole lives for this mission. 
-    As they crossed into the Andromeda Galaxy, they encountered worlds unlike anything they had ever imagined: 
-    planets with oceans of glass, forests of metal, and creatures made of living light. 
-    On one such planet, they found ruins of an ancient civilization, 
-    with towering stone structures that pulsed faintly as if still alive. 
-    Arin touched one of the walls, and suddenly a hologram of a being appeared before him, 
-    speaking in a language that felt strangely familiar. 
-    Over weeks of study, the crew realized that this long-lost species had once traveled the stars, 
-    but vanished after unlocking a dangerous technology that tore their world apart. 
-    Faced with this discovery, Captain Arin and his crew had to decide whether to continue deeper into the galaxy 
-    in search of knowledge or turn back, carrying a warning to all of humanity. 
-    In the end, they chose to move forward, not out of recklessness, 
-    but out of a belief that wisdom could be gained from the past without repeating its mistakes. 
-    Their story became the foundation of a new age of discovery.""",
-
-    # A magical realism story
-    """Every summer, in a small coastal town, the sea would bring gifts to the shore. 
-    Sometimes it was a piece of driftwood shaped like a crown, 
-    sometimes a jar filled with glowing sand, and once, an entire staircase made of seashells. 
-    The townspeople whispered that the ocean was alive, and it listened to their dreams. 
-    A boy named Theo, curious and restless, decided one day to ask the sea for an adventure. 
-    That night, he dreamed of a door made of water, standing tall on the beach. 
-    When he woke and ran to the shore, the door was truly there, rippling like liquid glass. 
-    Without hesitation, he stepped through it. 
-    On the other side, he found himself in a realm where fish flew through the air like birds 
-    and clouds floated beneath his feet like stepping stones. 
-    He met a girl made of starlight who told him that the ocean connected every world where dreams were real. 
-    Together, they sailed on a ship woven from silver threads, 
-    visited kingdoms where time moved backward, 
-    and battled shadows that tried to swallow entire skies. 
-    When Theo finally returned home, he was no longer just a boy from a coastal town— 
-    he carried the magic of a thousand worlds in his heart, 
-    and every time he closed his eyes, he could still hear the ocean calling his name.""",
-
-    # A modern drama
-    """Maya had always lived in the city, surrounded by noise, lights, and people rushing past one another. 
-    But after losing her job and feeling her life unravel, 
-    she decided to visit her grandmother’s old cottage in the countryside. 
-    At first, the silence unsettled her; there were no car horns, no late-night trains, 
-    only the soft rustle of leaves and the occasional call of an owl. 
-    Yet as days turned into weeks, Maya began to notice things she had long forgotten: 
-    the beauty of a sunrise, the way bread smelled as it baked in the oven, 
-    the joy of conversations that weren’t hurried. 
-    She started tending the small garden, learning to grow her own food, 
-    and even mending the old fence that her grandmother had left behind. 
-    Slowly, she realized that her worth was not tied to her career or achievements, 
-    but to the love she gave and received. 
-    One day, as she sat by the fireplace reading a book, 
-    she understood that she wasn’t lost at all—she had simply been searching in the wrong places. 
-    The city would always be there, but here, in this quiet corner of the world, 
-    Maya found herself again."""
-]
-
 
 tokenizer = Tokenizer(stories)
 vocab_size = len(tokenizer.stoi)
 
-model = Decoder(vocab_size)
+model = Decoder(vocab_size).to(device)
 
 if st.button("Train"):
     train_model(model, texts, tokenizer, epochs=200)
@@ -202,6 +129,6 @@ if st.button("Train"):
 input_text = st.text_input("Enter some words: ")
 if st.button("Generate"):
     if input_text.strip():
-        idx = torch.tensor([tokenizer.encode(input_text)], dtype=torch.long)
-        out = model.generate(idx, max_new_tokens=40)
+        idx = torch.tensor([tokenizer.encode(input_text)], dtype=torch.long, device=device)
+        out = model.generate(idx, max_new_tokens=512)
         st.write("Generated: ", tokenizer.decode(out[0].tolist()))
