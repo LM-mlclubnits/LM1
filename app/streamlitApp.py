@@ -10,7 +10,7 @@ from data.stories_list import stories
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 st.title("Sentence Completer")
 
-texts = [
+data_texts = [
     "Hello, how are you?",
     "I am fine, thank you.",
     "What are you doing?",
@@ -118,13 +118,13 @@ texts = [
 ]
 
 
-tokenizer = Tokenizer(stories)
+tokenizer = Tokenizer(data_texts)
 vocab_size = len(tokenizer.stoi)
 
 model = Decoder(vocab_size).to(device)
 
 if st.button("Train"):
-    train_model(model, texts, tokenizer, epochs=200)
+    train_model(model, data_texts, tokenizer, epochs=200)
 
 input_text = st.text_input("Enter some words: ")
 if st.button("Generate"):

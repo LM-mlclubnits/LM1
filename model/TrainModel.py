@@ -15,6 +15,8 @@ def train_model(model, data, tokenizer, epochs=200, lr=1e-3):
     chart_p = st.empty()
     loss_vals = []
 
+
+
     for epoch in range(epochs):
         tot_loss = 0
         for inp, tgt in zip(inputs, targets):

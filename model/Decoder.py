@@ -22,9 +22,9 @@ class Decoder(nn.Module):
         for block in self.blocks:
             x = block(x, mask=mask)
             x = self.ln(x)
-            return self.fc(x)
+        return self.fc(x)
 
-    def generate(self, idx, max_new_tokens):
+    def generate(self, idx, max_new_tokens) -> int:
         for _ in range(max_new_tokens):
             logits = self.forward(idx)
             next_token = torch.argmax(logits[:,-1,:], dim=-1).unsqueeze(1)
