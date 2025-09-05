@@ -6,8 +6,8 @@ from tqdm.auto import tqdm
 enc=tiktoken.get_encoding("gpt2")
 def process(example):
     ids=enc.encode_ordinary(example['text'])
-    out={'ids': ids,
-         'len': len(ids)
+    out={'ids':ids,
+         'len':len(ids)
         }
     return out
 if not os.path.exists("train.bin"):
