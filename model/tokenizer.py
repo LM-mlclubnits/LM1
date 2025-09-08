@@ -1,3 +1,6 @@
+
+#hcbkasjcvbaksjhvbashfvbkvbkjasv
+
 class Tokenizer:
     def __init__(self, texts):
         vocab = set(" ".join(texts).split())
