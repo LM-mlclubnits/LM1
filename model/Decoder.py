@@ -8,6 +8,7 @@ class Decoder(nn.Module):
         super().__init__()
         self.embed = nn.Embedding(vocab_size, d_model)
         self.pos_embed = nn.Embedding(max_len, d_model)
+        self.dropout = nn.Dropout(dropout)
         self.blocks = nn.ModuleList([TransformerBlock(d_model, n_heads, d_ff) for _ in range(n_layers)])
         self.ln = nn.LayerNorm(d_model)
         self.fc = nn.Linear(d_model, vocab_size)
@@ -17,6 +18,7 @@ class Decoder(nn.Module):
         B, T = x.shape
         pos = torch.arange(T, device=x.device).unsqueeze(0).expand(B, T)
         x = self.embed(x) + self.pos_embed(pos)
+        x = self.dropout(x)
         mask = torch.triu(torch.ones(T, T), diagonal=1).bool().to(x.device)
 
         for block in self.blocks:
