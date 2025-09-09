@@ -6,7 +6,7 @@ import streamlit as st
 def train_model(model, data, tokenizer, epochs=200, lr=1e-3):
     model.train()
     optimizer = torch.optim.AdamW(model.parameters(), lr = lr)
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(ignore_index=0) #to ignore padding
 
     inputs = [torch.tensor(tokenizer.encode(t)[:-1], dtype=torch.long) for t in data]
     targets = [torch.tensor(tokenizer.encode(t)[1:], dtype=torch.long) for t in data]
